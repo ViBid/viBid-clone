@@ -13,16 +13,17 @@ import { useToast } from "@/hooks/use-toast";
 
 interface SearchBarProps {
   initialTab?: "buy" | "rent" | "commercial" | "new-projects";
+  initialAI?: boolean;
 }
 
-export function SearchBar({ initialTab = "buy" }: SearchBarProps) {
+export function SearchBar({ initialTab = "buy", initialAI = false }: SearchBarProps) {
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState<string>(initialTab);
   const [propertyType, setPropertyType] = useState<string>("any");
   const [searchLocation, setSearchLocation] = useState<string>("");
   const [price, setPrice] = useState<string>("any");
   const [bedrooms, setBedrooms] = useState<string>("any");
-  const [useAI, setUseAI] = useState<boolean>(false);
+  const [useAI, setUseAI] = useState<boolean>(initialAI);
   const [aiQuery, setAiQuery] = useState<string>("");
   const { toast } = useToast();
 
