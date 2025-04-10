@@ -119,52 +119,70 @@ export default function AIPropertiesSearch() {
 
   if (!results) {
     return (
-      <div className="container mx-auto p-4 text-center">
-        <p>Loading search results...</p>
-      </div>
+      <>
+        <Header />
+        <div className="container mx-auto p-4 text-center py-16">
+          <p>Loading search results...</p>
+        </div>
+        <Footer />
+      </>
     );
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-4">AI Property Search Results</h1>
+    <>
+      <Header />
         
-        <AIPropertySearch />
-        
-        <div className="mt-6">
-          <div className="flex flex-wrap gap-2 mb-4">
-            {searchParams.map((param) => (
-              <Badge key={param.key} variant="outline" className="px-3 py-1 text-sm">
-                {param.label}
-              </Badge>
-            ))}
+      <div className="py-8 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h1 className="text-2xl font-bold mb-6">AI Property Search Results</h1>
             
-            {searchParams.length === 0 && (
-              <p className="text-gray-500 italic">No specific search parameters were identified</p>
-            )}
+            {/* Search Form with preselected AI toggle */}
+            <div className="mb-4">
+              <SearchBar initialAI={true} />
+            </div>
+            
+            <div className="mt-8">
+              <h2 className="text-lg font-semibold mb-3">Detected Search Parameters</h2>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {searchParams.map((param) => (
+                  <Badge key={param.key} variant="outline" className="px-3 py-1 text-sm">
+                    {param.label}
+                  </Badge>
+                ))}
+                
+                {searchParams.length === 0 && (
+                  <p className="text-gray-500 italic">No specific search parameters were identified</p>
+                )}
+              </div>
+              
+              <p className="text-gray-700 mt-4 font-medium">
+                Found {results.properties.length} properties matching your search
+              </p>
+            </div>
           </div>
           
-          <p className="text-gray-700">Found {results.properties.length} properties matching your search</p>
+          {results.properties.length === 0 ? (
+            <div className="text-center py-12 bg-white rounded-lg shadow-md">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h2 className="text-xl font-semibold mb-2">No properties found</h2>
+              <p className="text-gray-600 mb-4">We couldn't find any properties matching your search criteria.</p>
+              <Button onClick={() => setLocation("/")}>Return to Home</Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {results.properties.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
       
-      {results.properties.length === 0 ? (
-        <div className="text-center py-12">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <h2 className="text-xl font-semibold mb-2">No properties found</h2>
-          <p className="text-gray-600 mb-4">We couldn't find any properties matching your search criteria.</p>
-          <Button onClick={() => setLocation("/")}>Return to Home</Button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {results.properties.map((property) => (
-            <PropertyCard key={property.id} property={property} />
-          ))}
-        </div>
-      )}
-    </div>
+      <Footer />
+    </>
   );
 }
