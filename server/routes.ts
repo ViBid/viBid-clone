@@ -151,6 +151,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Parse the natural language query into structured search parameters
       const searchParams = await parseSearchQuery(query, language);
       
+      // Check if there was an error with the AI processing
+      if (searchParams.error) {
+        return res.status(500).json({ 
+          message: "AI search failed", 
+          error: searchParams.error,
+          searchParams: {}, // Return empty search params
+          properties: [] // Return empty properties array
+        });
+      }
+      
       // Search properties using the parsed parameters
       const properties = await storage.searchProperties(searchParams);
       
@@ -161,7 +171,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("AI search error:", error);
-      res.status(500).json({ message: "AI search failed" });
+      res.status(500).json({ 
+        message: "AI search failed", 
+        error: error.message,
+        searchParams: {},
+        properties: []
+      });
     }
   });
 

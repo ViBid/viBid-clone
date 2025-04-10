@@ -29,7 +29,7 @@ export function SearchBar({ initialTab = "buy", initialAI = false }: SearchBarPr
 
   const aiSearchMutation = useMutation({
     mutationFn: async (searchQuery: string) => {
-      return apiRequest<{ searchParams: any; properties: any[] }>(`/api/properties/ai-search`, {
+      return apiRequest<{ searchParams: any; properties: any[]; error?: string; message?: string }>(`/api/properties/ai-search`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,6 +38,17 @@ export function SearchBar({ initialTab = "buy", initialAI = false }: SearchBarPr
       });
     },
     onSuccess: (data) => {
+      // Check if there's an error message from the server
+      if (data.error || (data.properties && data.properties.length === 0 && Object.keys(data.searchParams || {}).length === 0)) {
+        toast({
+          title: "AI Search Unavailable",
+          description: "The AI search feature is currently unavailable. Either the AI service is down or not properly configured.",
+          variant: "destructive",
+          duration: 5000,
+        });
+        return;
+      }
+      
       // Display a success toast with the parsed parameters
       toast({
         title: "Search understood!",
@@ -51,12 +62,13 @@ export function SearchBar({ initialTab = "buy", initialAI = false }: SearchBarPr
       // Navigate to the AI search results page
       setLocation(`/ai-search`);
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("AI search error:", error);
       toast({
         title: "Search failed",
-        description: "Sorry, we couldn't process your search. Please try again.",
+        description: "Sorry, we couldn't process your search. Please try again or use the standard search instead.",
         variant: "destructive",
-        duration: 3000,
+        duration: 5000,
       });
     },
   });

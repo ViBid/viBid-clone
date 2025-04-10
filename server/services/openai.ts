@@ -17,6 +17,50 @@ const MODEL = "gpt-4o";
  */
 export async function parseSearchQuery(query: string, language: string = 'en'): Promise<SearchParams> {
   try {
+    // Check if we have a valid OpenAI API key
+    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'test') {
+      console.warn("Warning: Valid OPENAI_API_KEY is not set. Using fallback search method.");
+      
+      // Create a basic fallback search from the query string
+      const fallback: SearchParams = {};
+      
+      // Look for certain keywords in the query
+      if (query.toLowerCase().includes('buy') || query.toLowerCase().includes('purchase')) {
+        fallback.purpose = 'buy';
+      } else if (query.toLowerCase().includes('rent') || query.toLowerCase().includes('lease')) {
+        fallback.purpose = 'rent';
+      } else if (query.toLowerCase().includes('commercial') || query.toLowerCase().includes('office')) {
+        fallback.purpose = 'commercial';
+      }
+      
+      // Look for common property types
+      const propertyTypes = ['apartment', 'villa', 'townhouse', 'penthouse'];
+      for (const type of propertyTypes) {
+        if (query.toLowerCase().includes(type)) {
+          fallback.type = type;
+          break;
+        }
+      }
+      
+      // Extract bedroom info from simple patterns
+      const bedroomMatch = query.match(/(\d+)[\s-]*(bedroom|bed|br)/i);
+      if (bedroomMatch) {
+        fallback.bedrooms = parseInt(bedroomMatch[1]);
+      }
+      
+      // Extract location - look for common Dubai locations
+      const locations = ['dubai marina', 'palm jumeirah', 'downtown dubai', 'jumeirah', 'business bay'];
+      for (const loc of locations) {
+        if (query.toLowerCase().includes(loc)) {
+          fallback.location = loc;
+          break;
+        }
+      }
+      
+      return fallback;
+    }
+    
+    // If we have a valid API key, proceed with AI parsing
     const systemPrompt = language === 'ar' 
       ? "أنت محلل عقارات محترف. حلل استفسار البحث وقم بتحويله إلى معايير بحث منظمة. استجب بكائن JSON فقط."
       : "You are a professional real estate analyst. Analyze the search query and convert it to structured search criteria. Respond with a JSON object only.";
@@ -53,10 +97,14 @@ export async function parseSearchQuery(query: string, language: string = 'en'): 
       }
     }
     
+    console.log("Parsed search params:", result);
     return result as SearchParams;
   } catch (error) {
     console.error("Error parsing search query:", error);
-    return {};
+    
+    // Return a more explicit error object that will signal to the frontend
+    // that something went wrong with the AI processing
+    return { error: "Failed to parse search query" } as SearchParams;
   }
 }
 
