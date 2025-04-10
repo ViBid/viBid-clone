@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { PropertyCard } from "@/components/PropertyCard";
 import { Button } from "@/components/ui/button";
-import { AIPropertySearch } from "@/components/AIPropertySearch";
+import { SearchBar } from "@/components/SearchBar";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/constants";
 
