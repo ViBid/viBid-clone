@@ -39,7 +39,8 @@ export async function parseSearchQuery(query: string, language: string = 'en'): 
       response_format: { type: "json_object" }
     });
 
-    const result = JSON.parse(response.choices[0].message.content);
+    const content = response.choices[0].message.content || '{}';
+    const result = JSON.parse(content);
     
     // Convert purpose string to the format expected by the API
     if (result.purpose) {
@@ -82,7 +83,8 @@ export async function generatePropertyInsights(propertyData: any, language: stri
       response_format: { type: "json_object" }
     });
 
-    return JSON.parse(response.choices[0].message.content);
+    const content = response.choices[0].message.content || '{}';
+    return JSON.parse(content);
   } catch (error) {
     console.error("Error generating property insights:", error);
     return null;
@@ -114,7 +116,7 @@ export async function processPropertyConsultantMessage(messages: any[], language
       temperature: 0.7,
     });
 
-    return response.choices[0].message.content;
+    return response.choices[0].message.content || "";
   } catch (error) {
     console.error("Error processing consultant message:", error);
     return language === 'ar' 
@@ -140,7 +142,7 @@ export async function translateText(text: string, sourceLang: string, targetLang
       temperature: 0.3,
     });
 
-    return response.choices[0].message.content;
+    return response.choices[0].message.content || "";
   } catch (error) {
     console.error("Error translating text:", error);
     return text; // Return original text if translation fails
