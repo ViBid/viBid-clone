@@ -58,6 +58,13 @@ export function Header() {
                 Blog
               </a>
             </Link>
+            <Link href="/ai-search">
+              <a className={`font-medium ${location === '/ai-search' ? 'text-primary' : 'hover:text-primary'}`}>
+                <span className="flex items-center">
+                  <span className="mr-1">✨</span> AI Search
+                </span>
+              </a>
+            </Link>
           </nav>
 
           {/* User actions */}
