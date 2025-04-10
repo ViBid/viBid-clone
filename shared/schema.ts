@@ -244,6 +244,7 @@ export const searchSchema = z.object({
   bathrooms: z.number().optional(),
   minArea: z.number().optional(),
   maxArea: z.number().optional(),
+  error: z.string().optional(),
 });
 
 // Type exports
