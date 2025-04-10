@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatPrice, formatArea } from "@/lib/constants";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PropertyInsights } from "@/components/PropertyInsights";
+import { PropertyConsultant } from "@/components/PropertyConsultant";
 import { 
   Map, 
   Phone, 
@@ -20,7 +22,8 @@ import {
   ArrowRight, 
   CheckCircle,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Sparkles
 } from "lucide-react";
 import { useState } from "react";
 
@@ -186,6 +189,10 @@ export default function PropertyDetail() {
                 <TabsTrigger value="details">Details</TabsTrigger>
                 <TabsTrigger value="amenities">Amenities</TabsTrigger>
                 <TabsTrigger value="location">Location</TabsTrigger>
+                <TabsTrigger value="insights" className="flex items-center">
+                  <Sparkles size={16} className="mr-1 text-amber-500" />
+                  AI Insights
+                </TabsTrigger>
               </TabsList>
               
               <TabsContent value="details">
@@ -249,6 +256,10 @@ export default function PropertyDetail() {
                   </div>
                 </div>
               </TabsContent>
+              
+              <TabsContent value="insights">
+                <PropertyInsights propertyId={property.id} property={property} agent={agent} />
+              </TabsContent>
             </Tabs>
           </div>
           
@@ -298,6 +309,8 @@ export default function PropertyDetail() {
           </div>
         </div>
       </div>
+      
+      <PropertyConsultant />
       
       <Footer />
     </>
