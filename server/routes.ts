@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { searchSchema } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
+import { parseSearchQuery, generatePropertyInsights, processPropertyConsultantMessage, translateText } from "./services/openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API routes
@@ -135,6 +136,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(locations);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch locations" });
+    }
+  });
+
+  // AI-powered natural language search
+  app.post("/api/properties/ai-search", async (req, res) => {
+    try {
+      const { query, language = 'en' } = req.body;
+      
+      if (!query || typeof query !== 'string') {
+        return res.status(400).json({ message: "Query is required" });
+      }
+      
+      // Parse the natural language query into structured search parameters
+      const searchParams = await parseSearchQuery(query, language);
+      
+      // Search properties using the parsed parameters
+      const properties = await storage.searchProperties(searchParams);
+      
+      // Return both the parsed search parameters and the results
+      res.json({ 
+        searchParams,
+        properties 
+      });
+    } catch (error) {
+      console.error("AI search error:", error);
+      res.status(500).json({ message: "AI search failed" });
+    }
+  });
+
+  // Get property insights powered by AI
+  app.get("/api/properties/:id/insights", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const language = req.query.language as string || 'en';
+      
+      // Get the property data
+      const propertyWithAgent = await storage.getPropertyByIdWithAgent(id);
+      
+      if (!propertyWithAgent) {
+        return res.status(404).json({ message: "Property not found" });
+      }
+      
+      // Generate insights using AI
+      const insights = await generatePropertyInsights(propertyWithAgent, language);
+      
+      res.json({ insights });
+    } catch (error) {
+      console.error("Property insights error:", error);
+      res.status(500).json({ message: "Failed to generate property insights" });
+    }
+  });
+
+  // AI Property Consultant Chatbot
+  app.post("/api/consultant-chat", async (req, res) => {
+    try {
+      const { messages, language = 'en' } = req.body;
+      
+      if (!messages || !Array.isArray(messages)) {
+        return res.status(400).json({ message: "Valid messages array is required" });
+      }
+      
+      // Process the chat message using AI
+      const response = await processPropertyConsultantMessage(messages, language);
+      
+      res.json({ 
+        response,
+        timestamp: new Date().toISOString() 
+      });
+    } catch (error) {
+      console.error("AI consultant error:", error);
+      res.status(500).json({ message: "Failed to process chat message" });
+    }
+  });
+
+  // Translation service
+  app.post("/api/translate", async (req, res) => {
+    try {
+      const { text, sourceLang, targetLang } = req.body;
+      
+      if (!text || typeof text !== 'string') {
+        return res.status(400).json({ message: "Text to translate is required" });
+      }
+      
+      if (!sourceLang || !targetLang) {
+        return res.status(400).json({ message: "Source and target languages are required" });
+      }
+      
+      // Translate the text
+      const translatedText = await translateText(text, sourceLang, targetLang);
+      
+      res.json({ translatedText });
+    } catch (error) {
+      console.error("Translation error:", error);
+      res.status(500).json({ message: "Translation failed" });
     }
   });
 
