@@ -8,6 +8,8 @@ import { PopularSearches } from "@/components/PopularSearches";
 import { AgentCard } from "@/components/AgentCard";
 import { NewDevelopment } from "@/components/NewDevelopment";
 import { AppDownload } from "@/components/AppDownload";
+import { AIPropertySearch } from "@/components/AIPropertySearch";
+import { PropertyConsultant } from "@/components/PropertyConsultant";
 import { Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -66,6 +68,19 @@ export default function Home() {
           </h1>
           
           <SearchBar />
+        </div>
+      </section>
+      
+      {/* AI Property Search */}
+      <section className="py-12 bg-gradient-to-r from-primary/5 to-secondary/10">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-poppins font-semibold">AI-Powered Property Search</h2>
+            <p className="text-gray-600 mt-2">
+              Describe what you're looking for in natural language and let our AI find the perfect match
+            </p>
+          </div>
+          <AIPropertySearch />
         </div>
       </section>
       
@@ -204,6 +219,8 @@ export default function Home() {
       
       {/* App Download */}
       <AppDownload />
+      
+      <PropertyConsultant />
       
       <Footer />
     </>
