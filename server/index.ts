@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { seedDatabase } from "./seed";
+import { pushSchema } from "./push-schema";
 import session from "express-session";
 import { db } from "./db";
 import connectPgSimple from "connect-pg-simple";
@@ -60,11 +61,15 @@ app.use((req, res, next) => {
 
 (async () => {
   try {
-    // Initialize database with seed data
+    // First create all tables in the database
+    await pushSchema();
+    console.log("Database schema created successfully");
+    
+    // Then seed the database with initial data
     await seedDatabase();
-    console.log("Database initialized successfully");
+    console.log("Database seeded successfully");
   } catch (error) {
-    console.error("Failed to initialize database:", error);
+    console.error("Database initialization error:", error);
   }
   
   const server = await registerRoutes(app);
